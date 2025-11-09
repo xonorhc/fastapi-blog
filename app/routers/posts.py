@@ -3,16 +3,21 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
-from app.dependencies import SessionDep
-from app.models.posts import Post, PostCreate, PostPublic, PostUpdate
+from app.db import SessionDep
+from app.models import Post, PostCreate, PostPublic, PostUpdate
 
 router = APIRouter(
-    prefix="/posts", tags=["posts"], responses={404: {"description": "Not found"}}
+    prefix="/posts",
+    tags=["posts"],
+    responses={404: {"description": "Not found"}},
 )
 
 
 @router.post("/", response_model=PostPublic)
-async def create_post(post: PostCreate, session: SessionDep):
+async def create_post(
+    post: PostCreate,
+    session: SessionDep,
+):
     db_post = Post.model_validate(post)
     session.add(db_post)
     session.commit()
